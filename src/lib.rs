@@ -27,12 +27,12 @@
 use std::cmp::max;
 
 #[inline]
-fn get_shorter_longer_strings<S: AsRef<str>>(left: S, right: S) -> (String, String) {
+fn get_shorter_longer_strings(left: impl AsRef<str>, right: impl AsRef<str>) -> (String, String) {
     (left.as_ref().to_string(), right.as_ref().to_string())
 }
 
 /// Get length of the longest common subsequence
-pub fn lcs_length<S: AsRef<str>>(left: S, right: S) -> usize {
+pub fn lcs_length(left: impl AsRef<str>, right: impl AsRef<str>) -> usize {
     let (left, right) = get_shorter_longer_strings(left, right);
     let mut table = vec![vec![0 as usize; left.len() + 1]; 2];
 
@@ -51,19 +51,19 @@ pub fn lcs_length<S: AsRef<str>>(left: S, right: S) -> usize {
 }
 
 /// Get score of similarity of two certain strings
-pub fn compare_similarity<S: AsRef<str>>(left: S, right: S) -> f64 {
+pub fn compare_similarity(left: impl AsRef<str>, right: impl AsRef<str>) -> f64 {
     let (len1, len2) = (left.as_ref().len(), right.as_ref().len());
-    let lcs_len = lcs_length(left, right);
+    let lcs_len = lcs_length(left.as_ref(), right.as_ref());
     let size = max(len1, len2);
     lcs_len as f64 / size as f64
 }
 
 /// Find the string amongs the options that is the most similar to the target one
-pub fn find_best_similarity<S: AsRef<str>>(taregt: S, options: &[S]) -> (String, f64) {
+pub fn find_best_similarity(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> (String, f64) {
     let mut high_score: f64 = -1.0;
     let mut position: usize = 0;
     for (index, option) in options.iter().enumerate() {
-        let score = compare_similarity(option, &taregt);
+        let score = compare_similarity(option.as_ref(), taregt.as_ref());
         if score > high_score {
             high_score = score;
             position = index;
@@ -74,6 +74,8 @@ pub fn find_best_similarity<S: AsRef<str>>(taregt: S, options: &[S]) -> (String,
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use crate::*;
 
     #[test]
@@ -102,6 +104,19 @@ mod tests {
         let target = "fight";
         let options = vec!["blight", "night", "stride"];
         let (matched, score) = find_best_similarity(target, &options);
+        assert_eq!(matched, "night");
+        assert_eq!(score, 0.8);
+    }
+
+    #[test]
+    fn find_best_with_set() {
+        let target = format!("fight");
+        let mut options = HashSet::new();
+        options.insert("blight");
+        options.insert("night");
+        options.insert("stride");
+        let vector: Vec<_> = options.iter().collect();
+        let (matched, score) = find_best_similarity(target, &vector);
         assert_eq!(matched, "night");
         assert_eq!(score, 0.8);
     }
