@@ -6,7 +6,7 @@ description = "Find similar strings in Rust"
 license = "MIT"
 repository = "https://github.com/Ph0enixKM/similar-string"
 authors = ["pawel.karas@icloud.com"]
-keywords = ["string", "similar", "similarity", "compare", "find", "strings", "match"]
+keywords = ["string", "similar", "similarity", "compare", "find"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
