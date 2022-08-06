@@ -1,4 +1,7 @@
 # Similar String
+[![Crate](https://img.shields.io/crates/v/similar-string.svg)](https://crates.io/crates/similar-string)
+[![API](https://docs.rs/rand/badge.svg)](https://docs.rs/similar-string/)
+
 ...the library for finding string similarities 🔎
  
 With this library you can easily find rate of similarity of two strings or array of strings.
