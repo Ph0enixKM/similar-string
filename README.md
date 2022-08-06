@@ -5,7 +5,7 @@
 ...the library for finding string similarities 🔎
  
 With this library you can easily find rate of similarity of two strings or array of strings.
-Under the hood LCS (length finding variant) algorithm is used with O(n * m) time complexity and O(1) memory complexity.
+Under the hood LCS (length finding variant) algorithm is used with O(n * m) time complexity and O(n) memory complexity.
 
 # Example
 ```rust
