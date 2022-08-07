@@ -3,14 +3,25 @@
 //! # Similar String - the library for finding string similarities
 //! 
 //! With this library you can easily find rate of similarity of two strings or array of strings.
-//! Under the hood LCS (length finding variant) algorithm is used with O(n * m) time complexity and O(1) memory complexity.
+//! Under the hood LCS (length finding variant) algorithm is used with O(n * m) time complexity and O(min(n, m)) memory complexity.
 //! 
 //! # Example
 //! ```
-//! use similar_string::{compare_similarity, find_best_similarity};
+//! use similar_string::*;
 //! 
+//! // Compares similarity of two strings and returns similarity rating.
+//! // The rating is returned as a f64 value in range from 0.0 to 1.0.
 //! compare_similarity("age", "page"); // 0.75
-//! find_best_similarity("fight", &vec!["blight", "night", "stride"]); // ("night", 0.8)
+//! 
+//! let options = vec!["fill", "night", "ride"];
+//! 
+//! // Finds the best match amongst the options
+//! // and returns match with it's rating
+//! find_best_similarity("fight", &options); // ("night", 0.8)
+//! 
+//! // Returns all the similarity ratings
+//! // of the provided options
+//! get_similarity_ratings("fight", &options); // [0.4, 0.8, 0.2]
 //! ```
 //! 
 //! # LCS Algorithm
@@ -28,7 +39,11 @@ use std::cmp::max;
 
 #[inline]
 fn get_shorter_longer_strings(left: impl AsRef<str>, right: impl AsRef<str>) -> (String, String) {
-    (left.as_ref().to_string(), right.as_ref().to_string())
+    if left.as_ref().len() < right.as_ref().len() {
+        (left.as_ref().to_string(), right.as_ref().to_string())
+    } else {
+        (right.as_ref().to_string(), left.as_ref().to_string())
+    }
 }
 
 /// Get length of the longest common subsequence
@@ -72,9 +87,19 @@ pub fn find_best_similarity(taregt: impl AsRef<str>, options: &[impl AsRef<str>]
     (options[position].as_ref().to_string(), high_score)
 }
 
+/// Get all similarity scores against the target string
+pub fn get_similarity_ratings(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> Vec<f64> {
+    let mut result = vec![];
+    for option in options.iter() {
+        let score = compare_similarity(option.as_ref(), taregt.as_ref());
+        result.push(score);
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
+    use std::{collections::BTreeSet, vec};
 
     use crate::*;
 
@@ -111,7 +136,7 @@ mod tests {
     #[test]
     fn find_best_with_set() {
         let target = format!("fight");
-        let mut options = HashSet::new();
+        let mut options = BTreeSet::new();
         options.insert("blight");
         options.insert("night");
         options.insert("stride");
@@ -119,5 +144,17 @@ mod tests {
         let (matched, score) = find_best_similarity(target, &vector);
         assert_eq!(matched, "night");
         assert_eq!(score, 0.8);
+    }
+
+    #[test]
+    fn similarity_ratings() {
+        let expected = vec![0.4, 0.8, 0.2];
+        let options = vec![
+            "fill",
+            "night",
+            "ride"
+        ];
+        let ratings = get_similarity_ratings("fight", &options);
+        assert_eq!(expected, ratings);
     }
 }
