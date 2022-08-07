@@ -17,13 +17,15 @@ compare_similarity("age", "page"); // 0.75
 
 let options = vec!["fill", "night", "ride"];
 
+// The functions below return `None` if the provided slice is empty
+
 // Finds the best match amongst the options
 // and returns match with it's rating
-find_best_similarity("fight", &options); // ("night", 0.8)
+find_best_similarity("fight", &options); // Some(("night", 0.8))
 
 // Returns all the similarity ratings
 // of the provided options
-get_similarity_ratings("fight", &options); // [0.4, 0.8, 0.2]
+get_similarity_ratings("fight", &options); // Some([0.4, 0.8, 0.2])
 ```
 
 # LCS Algorithm
