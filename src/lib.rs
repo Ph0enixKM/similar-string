@@ -15,13 +15,15 @@
 //! 
 //! let options = vec!["fill", "night", "ride"];
 //! 
+//! // The functions below return `None` if the provided slice is empty
+//! 
 //! // Finds the best match amongst the options
 //! // and returns match with it's rating
-//! find_best_similarity("fight", &options); // ("night", 0.8)
+//! find_best_similarity("fight", &options); // Some(("night", 0.8))
 //! 
 //! // Returns all the similarity ratings
 //! // of the provided options
-//! get_similarity_ratings("fight", &options); // [0.4, 0.8, 0.2]
+//! get_similarity_ratings("fight", &options); // Some([0.4, 0.8, 0.2])
 //! ```
 //! 
 //! # LCS Algorithm
@@ -47,6 +49,12 @@ fn get_shorter_longer_strings(left: impl AsRef<str>, right: impl AsRef<str>) -> 
 }
 
 /// Get length of the longest common subsequence
+/// ```
+/// use similar_string::lcs_length;
+/// 
+/// // The longest common subsequence in this case is "one"
+/// lcs_length("longest", "stone"); // 3
+/// ```
 pub fn lcs_length(left: impl AsRef<str>, right: impl AsRef<str>) -> usize {
     let (left, right) = get_shorter_longer_strings(left, right);
     let mut table = vec![vec![0 as usize; left.len() + 1]; 2];
@@ -66,6 +74,14 @@ pub fn lcs_length(left: impl AsRef<str>, right: impl AsRef<str>) -> usize {
 }
 
 /// Get score of similarity of two certain strings
+/// # Example
+/// ```
+/// use similar_string::*;
+/// 
+/// // Compares similarity of two strings and returns similarity rating.
+/// // The rating is returned as a f64 value in range from 0.0 to 1.0.
+/// compare_similarity("age", "page"); // 0.75
+/// ```
 pub fn compare_similarity(left: impl AsRef<str>, right: impl AsRef<str>) -> f64 {
     let (len1, len2) = (left.as_ref().len(), right.as_ref().len());
     let lcs_len = lcs_length(left.as_ref(), right.as_ref());
@@ -74,27 +90,61 @@ pub fn compare_similarity(left: impl AsRef<str>, right: impl AsRef<str>) -> f64 
 }
 
 /// Find the string amongs the options that is the most similar to the target one
-pub fn find_best_similarity(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> (String, f64) {
-    let mut high_score: f64 = -1.0;
-    let mut position: usize = 0;
-    for (index, option) in options.iter().enumerate() {
-        let score = compare_similarity(option.as_ref(), taregt.as_ref());
-        if score > high_score {
-            high_score = score;
-            position = index;
+/// 
+/// This function returns `None` if the provided options is an empty slice
+/// # Example
+/// ```
+/// use similar_string::*;
+/// 
+/// let options = vec!["fill", "night", "ride"];
+/// 
+/// // Finds the best match amongst the options
+/// // and returns match with it's rating
+/// find_best_similarity("fight", &options); // ("night", 0.8)
+/// ```
+pub fn find_best_similarity(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> Option<(String, f64)> {
+    match options.len() {
+        0 => None,
+        _ => {
+            let mut high_score: f64 = -1.0;
+            let mut position: usize = 0;
+            for (index, option) in options.iter().enumerate() {
+                let score = compare_similarity(option.as_ref(), taregt.as_ref());
+                if score > high_score {
+                    high_score = score;
+                    position = index;
+                }
+            }
+            Some((options[position].as_ref().to_string(), high_score))
         }
     }
-    (options[position].as_ref().to_string(), high_score)
 }
 
 /// Get all similarity scores against the target string
-pub fn get_similarity_ratings(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> Vec<f64> {
-    let mut result = vec![];
-    for option in options.iter() {
-        let score = compare_similarity(option.as_ref(), taregt.as_ref());
-        result.push(score);
+/// 
+/// This function returns `None` if the provided options is an empty slice
+/// # Example
+/// ```
+/// use similar_string::*;
+/// 
+/// let options = vec!["fill", "night", "ride"];
+/// 
+/// // Returns all the similarity ratings
+/// // of the provided options
+/// get_similarity_ratings("fight", &options); // [0.4, 0.8, 0.2]
+/// ```
+pub fn get_similarity_ratings(taregt: impl AsRef<str>, options: &[impl AsRef<str>]) -> Option<Vec<f64>> {
+    match options.len() {
+        0 => None,
+        _ => {
+            let mut result = vec![];
+            for option in options.iter() {
+                let score = compare_similarity(option.as_ref(), taregt.as_ref());
+                result.push(score);
+            }
+            Some(result)
+        }
     }
-    result
 }
 
 #[cfg(test)]
@@ -128,7 +178,7 @@ mod tests {
     fn find_best() {
         let target = "fight";
         let options = vec!["blight", "night", "stride"];
-        let (matched, score) = find_best_similarity(target, &options);
+        let (matched, score) = find_best_similarity(target, &options).unwrap();
         assert_eq!(matched, "night");
         assert_eq!(score, 0.8);
     }
@@ -141,7 +191,7 @@ mod tests {
         options.insert("night");
         options.insert("stride");
         let vector: Vec<_> = options.iter().collect();
-        let (matched, score) = find_best_similarity(target, &vector);
+        let (matched, score) = find_best_similarity(target, &vector).unwrap();
         assert_eq!(matched, "night");
         assert_eq!(score, 0.8);
     }
@@ -154,7 +204,7 @@ mod tests {
             "night",
             "ride"
         ];
-        let ratings = get_similarity_ratings("fight", &options);
+        let ratings = get_similarity_ratings("fight", &options).unwrap();
         assert_eq!(expected, ratings);
     }
 }
