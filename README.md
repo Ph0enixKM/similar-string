@@ -39,6 +39,11 @@ lcs_length("longest", "stone"); // 3
 
 # Change log 🚀
 
+## Version 1.4.1
+### Fix:
+- Case when given slice is empty is now handled with `Option`
+- Improved code documentation
+
 ## Version 1.3.0
 ### Feature:
 - Add `get_similarity_ratings` function that retrieves all the ratings of all options
