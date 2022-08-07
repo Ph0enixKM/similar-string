@@ -1,6 +1,6 @@
 [package]
 name = "similar-string"
-version = "1.4.1"
+version = "1.4.2"
 edition = "2021"
 description = "Find similar strings in Rust"
 license = "MIT"
