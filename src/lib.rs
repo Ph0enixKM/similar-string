@@ -86,7 +86,8 @@ pub fn compare_similarity(left: impl AsRef<str>, right: impl AsRef<str>) -> f64 
     let (len1, len2) = (left.as_ref().len(), right.as_ref().len());
     let lcs_len = lcs_length(left.as_ref(), right.as_ref());
     let size = max(len1, len2);
-    lcs_len as f64 / size as f64
+    // Empty strings should match
+    if size == 0 { 1.0 } else { lcs_len as f64 / size as f64 }
 }
 
 /// Find the string amongs the options that is the most similar to the target one
@@ -172,6 +173,12 @@ mod tests {
         let score1 = compare_similarity(left, right);
         let score2 = compare_similarity(right, left);
         assert_eq!(score1, score2);
+    }
+
+    #[test]
+    fn empty_strings() {
+        let score = compare_similarity("", "");
+        assert_eq!(score, 1.0);
     }
 
     #[test]

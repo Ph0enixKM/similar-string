@@ -41,7 +41,11 @@ lcs_length("longest", "stone"); // 3
 
 # Change log 🚀
 
-## Version 1.4.1
+## Version 1.4.3
+### Fix:
+- Empty strings are now properly handled
+
+## Version 1.4.2
 ### Fix:
 - Case when given slice is empty is now handled with `Option`
 - Improved code documentation
